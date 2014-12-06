@@ -7,6 +7,7 @@ Created on Dec 6, 2014
 import string
 
 from . import BoardException
+from .Piece import Piece
 
 class Board:
     '''
@@ -32,6 +33,9 @@ class Board:
         self.side_to_move = "white"
         self.white_castle_rights = {}
         self.black_castle_rights = {}
+        self.en_passant_square = None
+        self.half_move_count = 0
+        self.move_count = 0
         
     def reset_to_starting_positiion(self):
         self.parse_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -48,21 +52,50 @@ class Board:
             raise BoardException("incorrect or unparsable FEN string")
         
         current_square = ['a', 8]
+        def move_forward_on_rank(steps=1):
+            current_letter_index = string.ascii_lowercase.find(current_square[0])
+            print("current_letter_index is ", current_letter_index, " and the char there is ", string.ascii_lowercase[current_letter_index])
+            current_square[0] = string.ascii_lowercase[current_letter_index + steps]
+
         ranks = piece_placements.split('/')
         for rank_string in ranks:
             for char in rank_string:
+                print("current square {}{} and current char {}".format(current_square[0], current_square[1], char))
                 if char.isdigit():
-                    current_letter_index = string.lowercase.find(current_square[0])
-                    print("current_letter_index is ", current_letter_index, " and the char there is ", string.lowercase[current_letter_index])
-                    current_square[0] = string.lowercase[current_letter_index + int(char)]
+                    print("skipping forward")
+                    move_forward_on_rank(int(char))
                 else:
+                    print("writing char")
                     self.board[current_square[0] + str(current_square[1])] = char
+                    move_forward_on_rank()
+                    
             current_square[1] = current_square[1] - 1
             current_square[0] = 'a'
+    
+    #magic methods for treating a board as a dictionary
+    def __getitem__(self, key):
+        return self.board.get(key, '')
+    def __iter__(self):
+        return self.board.__iter__()
+    def __contains__(self, key):
+        return self.board.__contains__(key)
+    
+    
+    def get_piece(self, square):
+        piece = self[square]
+        if not piece:
+            return ''
+        else:
+            piece_name = Piece.piece_names[piece.lower()]
+            color = "white" if piece.is_upper() else "black"
+            return Piece(piece_name, square, color, self)
             
     def __repr__(self):
         return self.board.__repr__()
     
+    
+    
+    #checkmates...
     def is_white_checkmate(self):
         return False
     
@@ -72,9 +105,22 @@ class Board:
     def is_checkmate(self):
         return self.is_black_checkmate() or self.is_white_checkmate()
     
+    #draws
     def is_stalemate(self):
         return False
-    
     def is_forced_draw(self):
         return self.is_stalemate or self.half_move_counter > 50
+    
+    def is_finished(self):
+        return self.is_checkmate() or self.is_forced_draw()
+    
+    #pieces
+    def get_white_pieces(self):
+        return {}
+    def get_black_pieces(self):
+        return {}
+    def get_pieces(self):
+        return self.get_black_pieces() + self.get_white_pieces()
+    
+  
         
