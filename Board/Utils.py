@@ -29,6 +29,23 @@ def southwest_diagonal(square):
     file, rank = square[0], int(square[1])
     return move_file(file, -1) + str(rank - 1)
 
+def up_file(square):
+    file, rank = square[0], int(square[1])
+    return file + str(rank + 1)
+
+def down_file(square):
+    file, rank = square[0], int(square[1])
+    return file + str(rank - 1)
+
+def east_rank(square):
+    file, rank = square[0], int(square[1])
+    return move_file(file, -1) + str(rank)
+
+def west_rank(square):
+    file, rank = square[0], int(square[1])
+    return move_file(file, 1) + str(rank)
+
+
  
 
 

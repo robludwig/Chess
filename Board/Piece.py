@@ -7,6 +7,7 @@ Created on Dec 6, 2014
 import string
 from .Move import Move
 from .Utils import on_board, move_file, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal
+from .Utils import down_file, up_file, east_rank, west_rank
 class Piece:
     '''
     Represents a piece on the board 
@@ -144,12 +145,69 @@ class Piece:
         return moves
     def rook_moves(self):
         moves = []
+        for direction in [down_file, up_file, east_rank, west_rank]:
+            obstructed = False
+            current_square = self.square
+            while not obstructed:
+                target_square = direction(current_square)
+                if not on_board(target_square):
+                    break
+                if self.board[target_square]:
+                    obstructed = True
+                    piece = self.board.get_piece_on_square(target_square)
+                    if piece.color != self.color:
+                        moves.append(Move(self.square, target_square))
+                else:
+                    moves.append(Move(self.square, target_square))
+                    current_square = target_square                 
         return moves
     def queen_moves(self):
         moves = self.bishop_moves() + self.rook_moves()
         return moves
     def king_moves(self):
-        moves = []
+        moves = [] 
+        
+        #single moves
+        directions = [down_file, up_file, east_rank, west_rank, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal]
+        possible_squares = [direction(self.square) for direction in directions if on_board(direction(self.square)) and not self.board[direction(self.square)]]
+        for square in possible_squares:
+            test_board = self.board.copy()
+            possible_move = Move(self.square, square)
+            test_board.do_move(possible_move)
+            if self.color == 'white':
+                if not test_board.is_white_check():
+                    moves.append(possible_move)
+            else:
+                if not test_board.is_black_check():
+                    moves.append(possible_move)
+        #castling
+        if self.color == 'white':
+            if not self.board.is_white_check():
+                if self.board.white_castle_rights['kingside']:
+                    #check the possible squares
+                    for intervening_square in ['g1', 'f1']:
+                        if not self.board[intervening_square] and intervening_square not in self.board.get_black_moves():
+                            moves.append(self.square, 'g1', castling='kingside')
+                if self.board.white_castle_rights['queenside']:
+                    #check the possible squares
+                    if not self.board['b1']:
+                        for intervening_square in ['d1', 'c1']:
+                            if not self.board[intervening_square] and intervening_square not in self.board.get_black_moves():
+                                moves.append(self.square, 'c1', castling='queenside')
+        if self.color == 'black':
+            if not self.board.is_black_check():
+                if self.board.check_castle_rights['kingside']:
+                    #check the possible squares
+                    for intervening_square in ['g8', 'f8']:
+                        if not self.board[intervening_square] and intervening_square not in self.board.get_white_moves():
+                            moves.append(self.square, 'g8', castling='kingside')
+                if self.board.white_castle_rights['queenside']:
+                    #check the possible squares
+                    if not self.board['b8']:
+                        for intervening_square in ['d8', 'c8']:
+                            if not self.board[intervening_square] and intervening_square not in self.board.get_white_moves():
+                                moves.append(self.square, 'c8', castling='queenside')
+            
         return moves
     
     def __repr__(self):

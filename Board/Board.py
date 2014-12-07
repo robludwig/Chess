@@ -187,17 +187,36 @@ class Board:
         deletes the piece at the original square and overwrites the destination with the new piece
         it is advisable to call board.is_finished() after this to see if the game is complete
         '''
-        original_piece = self.board[move.origin]
+        original_piece = self.board[move.origin]    
         del self.board[move.origin]
         if move.en_passant:
             self.en_passant_square = move.en_passant
         else:
             self.en_passant_square = ''
-            
+                        
         capture = self.board[move.destination] 
         
         #write in the new piece if it's a promotion, or the original piece otherwise
-        if not move.promotion:
+        if move.castle:
+            #move the king
+            self.board[move.destination] = original_piece
+            
+            #move the correct rook
+            if move.castle == 'kingside':
+                rook_file = 'h'
+                target_file = 'f'
+            else:
+                rook_file = 'a'
+                target_file = 'd'
+            if self.side_to_move == 'white':
+                rook_rank = 1
+            else:
+                rook_rank = 8
+            rook_location = rook_file + str(rook_rank)
+            rook_target = target_file + str(rook_rank)
+            self.board[rook_target] = self.board[rook_location]
+            del self.board[rook_location]
+        elif not move.promotion:
             self.board[move.destination] = original_piece
         else:
             promotion = move.promotion
@@ -208,7 +227,22 @@ class Board:
         #housekeeping    
         self.side_to_move = "white" if self.side_to_move == "black" else "black"
         self.move_count += 1
-        
+        #remove castling rights if necessary
+        if original_piece in ['kKrR']:
+            if original_piece == 'k':
+                self.black_castle_rights = {}
+            if original_piece == 'K':
+                self.black_castle_rights == {}
+            else:
+                if move.origin == 'a1':
+                    self.white_castle_rights['queenside'] = False
+                elif move.origin == 'h1':
+                    self.white_castle_rights['kingside'] = False
+                elif move.origin == 'a8':
+                    self.black_castle_rights['queenside'] = False
+                else:
+                    self.black_castle_rights['kingside'] = False
+            
         #reset the half-ply counter if capture or pawn move
         if capture or original_piece.tolower == Piece.PAWN:
             self.half_move_count = 0
