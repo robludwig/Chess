@@ -17,16 +17,7 @@ class Piece:
     QUEEN = "queen"
     KING = "king"
     
-    move_functions = {
-                      
-                      PAWN  : pawn_moves,
-                      BISHOP: bishop_moves,
-                      QUEEN : queen_moves,
-                      KING  : king_moves,
-                      ROOK  : rook_moves,
-                      KNIGHT: knight_moves
-                  
-                      }
+    
     
     piece_names = {
                    
@@ -47,8 +38,29 @@ class Piece:
         self.square = square
         self.color = color
         self.board = board
-        self.moves = self.move_functions(self.piece)
+        self.move_function = {
+                      
+                      Piece.PAWN  : self.pawn_moves,
+                      Piece.BISHOP: self.bishop_moves,
+                      Piece.QUEEN : self.queen_moves,
+                      Piece.KING  : self.king_moves,
+                      Piece.ROOK  : self.rook_moves,
+                      Piece.KNIGHT: self.knight_moves
+                  
+         }[self.piece]
         
+    
+    def get_base_value(self):
+        return {
+                      
+                      Piece.PAWN  : 1,
+                      Piece.BISHOP: 3,
+                      Piece.QUEEN : 9,
+                      Piece.KING  : 10000,
+                      Piece.ROOK  : 5,
+                      Piece.KNIGHT: 3
+                  
+         }[self.piece]
     
     def pawn_moves(self):
         moves = []

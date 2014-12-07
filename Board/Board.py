@@ -114,7 +114,7 @@ class Board:
             return ''
         else:
             piece_name = Piece.piece_names[piece.lower()]
-            color = "white" if piece.is_upper() else "black"
+            color = "white" if piece.isupper() else "black"
             return Piece(piece_name, square, color, self)
             
     def __repr__(self):
@@ -143,11 +143,22 @@ class Board:
     
     #pieces
     def get_white_pieces(self):
-        return {}
+        return [self.get_piece(square) for square in self.board.keys() if self[square].isupper()]
     def get_black_pieces(self):
-        return {}
+        return [self.get_piece(square) for square in self.board.keys() if self[square].islower()]
     def get_pieces(self):
-        return self.get_black_pieces() + self.get_white_pieces()
+        return [self.get_piece(square) for square in self.board.keys()]
     
-  
+    #moves
+    def do_move(self, origin_square, destintion_square):
+        '''
+        naively moves a piece from the provided origin to the destination
+        does not check for e.g. validity, checkmates, etc.
+        deletes the piece at the original square and overwrites the destination with the new piece
+        it is advisable to call board.is_finished() after this to see if the game is complete
+        '''
+        original_piece = self.board[origin_square]
+        del self.board[origin_square]
+        self.board[destintion_square] = original_piece
+        return
         
