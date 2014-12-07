@@ -150,6 +150,17 @@ class Board:
         return [self.get_piece(square) for square in self.board.keys()]
     
     #moves
+    def get_white_moves(self):
+        moves = []
+        for piece in self.get_white_pieces():
+            moves.extend(piece.get_moves())
+        return moves
+    def get_black_moves(self):
+        moves = []
+        for piece in self.get_black_moves():
+            moves.extend(piece.get_moves())
+        return moves
+    
     def do_move(self, origin_square, destintion_square):
         '''
         naively moves a piece from the provided origin to the destination
