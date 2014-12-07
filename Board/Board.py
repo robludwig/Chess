@@ -54,23 +54,50 @@ class Board:
         current_square = ['a', 8]
         def move_forward_on_rank(steps=1):
             current_letter_index = string.ascii_lowercase.find(current_square[0])
-            print("current_letter_index is ", current_letter_index, " and the char there is ", string.ascii_lowercase[current_letter_index])
+           #print("current_letter_index is ", current_letter_index, " and the char there is ", string.ascii_lowercase[current_letter_index])
             current_square[0] = string.ascii_lowercase[current_letter_index + steps]
 
+        #place all the pieces
+        print("piece placements: ", piece_placements)
         ranks = piece_placements.split('/')
         for rank_string in ranks:
             for char in rank_string:
-                print("current square {}{} and current char {}".format(current_square[0], current_square[1], char))
+                #print("current square {}{} and current char {}".format(current_square[0], current_square[1], char))
                 if char.isdigit():
-                    print("skipping forward")
+                    #print("skipping forward")
                     move_forward_on_rank(int(char))
                 else:
-                    print("writing char")
+                    #print("writing char")
                     self.board[current_square[0] + str(current_square[1])] = char
                     move_forward_on_rank()
                     
             current_square[1] = current_square[1] - 1
             current_square[0] = 'a'
+        
+        #active color
+        print("active color: ", active_color)
+        if active_color == 'w':
+            self.side_to_move = "white"
+        else:
+            self.side_to_move = "black"
+            
+        #castling rights are either "-" for none, or a list of letters
+        print("castling rights: ", castling_rights)
+        if castling_rights == "-":
+            print("nobody has castling rights")
+        else:
+            self.black_castle_rights['queenside'] = 'q' in castling_rights
+            self.black_castle_rights['kingside'] = 'k' in castling_rights
+            self.white_castle_rights['queenside'] = 'Q' in castling_rights
+            self.white_castle_rights['kingside'] = 'K' in castling_rights
+        
+        #ep
+        print("en passant square ", en_passant)
+        self.en_passant_square = en_passant if en_passant != "-" else ''
+        
+        #half and full move clocks...
+        self.half_move_count = int(half_moves)
+        self.move_count = int(full_moves)
     
     #magic methods for treating a board as a dictionary
     def __getitem__(self, key):
