@@ -5,6 +5,7 @@ Created on Dec 6, 2014
 '''
 
 import string
+from copy import deepcopy
 
 from . import BoardException
 from .Piece import Piece
@@ -37,7 +38,10 @@ class Board:
         self.en_passant_square = None
         self.half_move_count = 0
         self.move_count = 0
-        
+    
+    def copy(self):
+        return deepcopy(self)
+    
     def reset_to_starting_positiion(self):
         self.parse_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
         
