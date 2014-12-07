@@ -50,6 +50,9 @@ class Piece:
          }[self.piece]
         
     
+    def get_moves(self):
+        return self.move_function()
+    
     def get_base_value(self):
         return {
                       
@@ -65,17 +68,26 @@ class Piece:
     def pawn_moves(self):
         moves = []
         file = self.square[0]
+        rank = int(self.square[1])
+        first_move = False
         
         #file in front is the file one step forward
         if self.color == 'white':
-            rank_in_front = str(int(self.square[1]) + 1)
+            rank_in_front = str(rank + 1)
+            if rank == 2:
+                first_move = file + str(rank + 2)
         else:
-            rank_in_front = str(int(self.square[1]) - 1)
+            rank_in_front = str(rank - 1)
+            if rank == 7:
+                first_move = file + str(rank - 2)
+            
             
         #pawn can only move forward if unoccupied    
         square_in_front = file + rank_in_front
         if not self.board[square_in_front]:
             moves.append(square_in_front)
+        if first_move and not self.board[first_move]:
+            moves.append(first_move)
             
         #pawn can only move to attacking squares if occupied...
         file_index = string.ascii_lowercase.find(file)

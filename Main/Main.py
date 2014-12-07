@@ -13,4 +13,5 @@ if __name__ == '__main__':
     print(board)
     print(board.get_white_pieces())
     print(sum([piece.get_base_value() for piece in board.get_black_pieces()]))
+    print("available moves: ", board.get_white_moves())
     print(evaluate(board))
