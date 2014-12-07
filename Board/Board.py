@@ -109,7 +109,7 @@ class Board:
         return self.board.__contains__(key)
     
     
-    def get_piece(self, square):
+    def get_piece_on_square(self, square):
         piece = self[square]
         if not piece:
             return ''
@@ -117,18 +117,32 @@ class Board:
             piece_name = Piece.piece_names[piece.lower()]
             color = "white" if piece.isupper() else "black"
             return Piece(piece_name, square, color, self)
+                
+    def get_piece_square(self, piece):
+        for key in self.board.keys():
+            if self.board[key] == piece:
+                return key
+        return ''
             
     def __repr__(self):
         return self.board.__repr__()
     
     
     
-    #checkmates...
+    #checks and checkmates...
+    def is_white_check(self):
+        white_king_square = self.get_piece_square('K')
+        return white_king_square in self.get_black_moves()
+    
     def is_white_checkmate(self):
-        return False
+        return self.is_white_check() and self.get_white_moves() == []
+    
+    def is_black_check(self):
+        black_king_square = self.get_piece_square('k')
+        return black_king_square in self.get_white_moves()
     
     def is_black_checkmate(self):
-        return False
+        return self.is_black_check() and self.get_black_moves() == []
     
     def is_checkmate(self):
         return self.is_black_checkmate() or self.is_white_checkmate()
@@ -144,11 +158,11 @@ class Board:
     
     #pieces
     def get_white_pieces(self):
-        return [self.get_piece(square) for square in self.board.keys() if self[square].isupper()]
+        return [self.get_piece_on_square(square) for square in self.board.keys() if self[square].isupper()]
     def get_black_pieces(self):
-        return [self.get_piece(square) for square in self.board.keys() if self[square].islower()]
+        return [self.get_piece_on_square(square) for square in self.board.keys() if self[square].islower()]
     def get_pieces(self):
-        return [self.get_piece(square) for square in self.board.keys()]
+        return [self.get_piece_on_square(square) for square in self.board.keys()]
     
     #moves
     def get_white_moves(self):

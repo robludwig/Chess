@@ -99,7 +99,7 @@ class Piece:
         neighboring_files = (move_file(self.file, 1), move_file(self.file, -1 ))
         attackable_squares = (neighboring_files[0] + rank_in_front, neighboring_files[1] + rank_in_front)
         for square in attackable_squares:
-            piece_on_square = self.board.get_piece(square)
+            piece_on_square = self.board.get_piece_on_square(square)
             if piece_on_square and piece_on_square != self.color:
                 moves.append(Move(self.square, square))
             elif self.board.en_passant_square == square:
@@ -113,14 +113,14 @@ class Piece:
             for file in [move_file(self.file, -1), move_file(self.file, 1)]:
                 target_square = file + str(rank)
                 print("checking target_square", target_square)
-                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece(target_square).color != self.color):
+                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece_on_square(target_square).color != self.color):
                      moves.append(Move(self.square, target_square))
                      
         for rank in [self.rank + 1, self.rank - 1]:
             for file in [move_file(self.file, -2), move_file(self.file, 2)]:
                 target_square = file + str(rank)
                 print("checking target_square", target_square)
-                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece(target_square).color != self.color):
+                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece_on_square(target_square).color != self.color):
                      moves.append(Move(self.square, target_square))
         return moves
     
