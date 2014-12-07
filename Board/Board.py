@@ -9,6 +9,7 @@ import string
 from . import BoardException
 from .Piece import Piece
 
+
 class Board:
     '''
     Represents a board as a dictionary and allows piece lookup using board['a1'] syntax.
@@ -161,15 +162,39 @@ class Board:
             moves.extend(piece.get_moves())
         return moves
     
-    def do_move(self, origin_square, destintion_square):
+    def do_move(self, move):
         '''
         naively moves a piece from the provided origin to the destination
         does not check for e.g. validity, checkmates, etc.
         deletes the piece at the original square and overwrites the destination with the new piece
         it is advisable to call board.is_finished() after this to see if the game is complete
         '''
-        original_piece = self.board[origin_square]
-        del self.board[origin_square]
-        self.board[destintion_square] = original_piece
+        original_piece = self.board[move.origin]
+        del self.board[move.origin]
+        if move.en_passant:
+            self.en_passant_square = move.en_passant
+        else:
+            self.en_passant_square = ''
+            
+        capture = self.board[move.destination] 
+        
+        #write in the new piece if it's a promotion, or the original piece otherwise
+        if not move.promotion:
+            self.board[move.destination] = original_piece
+        else:
+            promotion = move.promotion
+            if self.side_to_move == 'white':
+                promotion = promotion.toupper()
+            self.board[move.destination] = promotion
+        
+        #housekeeping    
+        self.side_to_move = "white" if self.side_to_move == "black" else "black"
+        self.move_count += 1
+        
+        #reset the half-ply counter if capture or pawn move
+        if capture or original_piece.tolower == Piece.PAWN:
+            self.half_move_count = 0
+        else:
+            self.half_move_count += 1
         return
         
