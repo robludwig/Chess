@@ -5,7 +5,8 @@ Created on Dec 6, 2014
 '''
 
 import string
-
+from .Move import Move
+from .Utils import on_board, move_file
 class Piece:
     '''
     Represents a piece on the board 
@@ -48,6 +49,8 @@ class Piece:
                       Piece.KNIGHT: self.knight_moves
                   
          }[self.piece]
+        self.file = self.square[0]
+        self.rank = int(self.square[1])
         
     
     def get_moves(self):
@@ -67,44 +70,60 @@ class Piece:
     
     def pawn_moves(self):
         moves = []
-        file = self.square[0]
-        rank = int(self.square[1])
         first_move = False
         
         #file in front is the file one step forward
         if self.color == 'white':
-            rank_in_front = str(rank + 1)
-            if rank == 2:
-                first_move = file + str(rank + 2)
+            rank_in_front = str(self.rank + 1)
+            if self.rank == 2:
+                first_move = self.file + str(self.rank + 2)
+            promotion_rank = 8
         else:
-            rank_in_front = str(rank - 1)
-            if rank == 7:
-                first_move = file + str(rank - 2)
-            
+            rank_in_front = str(self.rank - 1)
+            if self.rank == 7:
+                first_move = self.file + str(self.rank - 2)
+            promotion_rank = 1
             
         #pawn can only move forward if unoccupied    
-        square_in_front = file + rank_in_front
+        square_in_front = self.file + rank_in_front
         if not self.board[square_in_front]:
-            moves.append(square_in_front)
-        if first_move and not self.board[first_move]:
-            moves.append(first_move)
+            if rank_in_front == promotion_rank:
+                for piece in ['q', 'r', 'n', 'b']:
+                    moves.append(Move(self.square), square_in_front, False, piece)                    
+            else:
+                moves.append(Move(self.square, square_in_front))
+        if first_move and not self.board[first_move] and not self.board[square_in_front]:
+            moves.append(Move(self.square, first_move, True))
             
         #pawn can only move to attacking squares if occupied...
-        file_index = string.ascii_lowercase.find(file)
-        neighboring_files = (string.ascii_lowercase[file_index + 1], string.ascii_lowercase[file_index - 1])
+        neighboring_files = (move_file(self.file, 1), move_file(self.file, -1 ))
         attackable_squares = (neighboring_files[0] + rank_in_front, neighboring_files[1] + rank_in_front)
         for square in attackable_squares:
             piece_on_square = self.board.get_piece(square)
             if piece_on_square and piece_on_square != self.color:
-                moves.append(square)
+                moves.append(Move(self.square, square))
             elif self.board.en_passant_square == square:
-                moves.append(square)
+                moves.append(Move(self.square, square))
         return moves
     
     
     def knight_moves(self):
         moves = []
+        for rank in [self.rank + 2, self.rank - 2]:
+            for file in [move_file(self.file, -1), move_file(self.file, 1)]:
+                target_square = file + str(rank)
+                print("checking target_square", target_square)
+                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece(target_square).color != self.color):
+                     moves.append(Move(self.square, target_square))
+                     
+        for rank in [self.rank + 1, self.rank - 1]:
+            for file in [move_file(self.file, -2), move_file(self.file, 2)]:
+                target_square = file + str(rank)
+                print("checking target_square", target_square)
+                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece(target_square).color != self.color):
+                     moves.append(Move(self.square, target_square))
         return moves
+    
     def bishop_moves(self):
         moves = []
         return moves
