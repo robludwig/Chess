@@ -146,7 +146,7 @@ class Piece:
         moves = []
         return moves
     def queen_moves(self):
-        moves = []
+        moves = self.bishop_moves() + self.rook_moves()
         return moves
     def king_moves(self):
         moves = []
