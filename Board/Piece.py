@@ -6,7 +6,7 @@ Created on Dec 6, 2014
 
 import string
 from .Move import Move
-from .Utils import on_board, move_file
+from .Utils import on_board, move_file, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal
 class Piece:
     '''
     Represents a piece on the board 
@@ -112,20 +112,35 @@ class Piece:
         for rank in [self.rank + 2, self.rank - 2]:
             for file in [move_file(self.file, -1), move_file(self.file, 1)]:
                 target_square = file + str(rank)
-                print("checking target_square", target_square)
+                #print("checking target_square", target_square)
                 if on_board(target_square) and (not self.board[target_square] or self.board.get_piece_on_square(target_square).color != self.color):
                      moves.append(Move(self.square, target_square))
                      
         for rank in [self.rank + 1, self.rank - 1]:
             for file in [move_file(self.file, -2), move_file(self.file, 2)]:
                 target_square = file + str(rank)
-                print("checking target_square", target_square)
+                #print("checking target_square", target_square)
                 if on_board(target_square) and (not self.board[target_square] or self.board.get_piece_on_square(target_square).color != self.color):
                      moves.append(Move(self.square, target_square))
         return moves
     
     def bishop_moves(self):
         moves = []
+        for direction in [northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal]:
+            obstructed = False
+            current_square = self.square
+            while not obstructed:
+                target_square = direction(current_square)
+                if not on_board(target_square):
+                    break
+                if self.board[target_square]:
+                    obstructed = True
+                    piece = self.board.get_piece_on_square(target_square)
+                    if piece.color != self.color:
+                        moves.append(Move(self.square, target_square))
+                else:
+                    moves.append(Move(self.square, target_square))
+                    current_square = target_square                 
         return moves
     def rook_moves(self):
         moves = []

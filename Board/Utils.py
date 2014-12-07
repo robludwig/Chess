@@ -13,5 +13,23 @@ def move_file(file_letter, value):
     current_file =  string.ascii_lowercase.find(file_letter)
     return string.ascii_lowercase[current_file + value]
 
+def northeast_diagonal(square):
+    file, rank = square[0], int(square[1])
+    return move_file(file, 1) + str(rank + 1)
+
+def northwest_diagonal(square):
+    file, rank = square[0], int(square[1])
+    return move_file(file, -1) + str(rank + 1)
+
+def southeast_diagonal(square):
+    file, rank = square[0], int(square[1])
+    return move_file(file, 1) + str(rank - 1)
+
+def southwest_diagonal(square):
+    file, rank = square[0], int(square[1])
+    return move_file(file, -1) + str(rank - 1)
+
+ 
+
 
         
