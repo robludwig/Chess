@@ -8,6 +8,9 @@ import string
 from .Move import Move
 from .Utils import on_board, move_file, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal
 from .Utils import down_file, up_file, east_rank, west_rank
+from .PieceMoves import bishop_moves, pawn_moves, knight_moves, king_moves, rook_moves, queen_moves
+from .PieceAttacks import bishop_attacks, pawn_attacks, knight_attacks, king_attacks, rook_attacks, queen_attacks
+
 class Piece:
     '''
     Represents a piece on the board 
@@ -40,22 +43,33 @@ class Piece:
         self.square = square
         self.color = color
         self.board = board
-        self.move_function = {
-                      
-                      Piece.PAWN  : self.pawn_moves,
-                      Piece.BISHOP: self.bishop_moves,
-                      Piece.QUEEN : self.queen_moves,
-                      Piece.KING  : self.king_moves,
-                      Piece.ROOK  : self.rook_moves,
-                      Piece.KNIGHT: self.knight_moves
-                  
+        self.move_function = {                   
+          Piece.PAWN  : pawn_moves,
+          Piece.BISHOP: bishop_moves,
+          Piece.QUEEN : queen_moves,
+          Piece.KING  : king_moves,
+          Piece.ROOK  : rook_moves,
+          Piece.KNIGHT: knight_moves  
          }[self.piece]
+         
+        self.attack_functions = {                               
+          Piece.PAWN  : pawn_attacks,
+          Piece.BISHOP: bishop_attacks,
+          Piece.QUEEN : queen_attacks,
+          Piece.KING  : king_attacks,
+          Piece.ROOK  : rook_attacks,
+          Piece.KNIGHT: knight_attacks         
+         }[self.piece]
+         
         self.file = self.square[0]
         self.rank = int(self.square[1])
         
     
     def get_moves(self):
-        return self.move_function()
+        return self.move_function(self)
+    
+    def get_attacked_squares(self):
+        return self.attack_functions(self)
     
     def get_base_value(self):
         return {
@@ -69,146 +83,6 @@ class Piece:
                   
          }[self.piece]
     
-    def pawn_moves(self):
-        moves = []
-        first_move = False
-        
-        #file in front is the file one step forward
-        if self.color == 'white':
-            rank_in_front = str(self.rank + 1)
-            if self.rank == 2:
-                first_move = self.file + str(self.rank + 2)
-            promotion_rank = 8
-        else:
-            rank_in_front = str(self.rank - 1)
-            if self.rank == 7:
-                first_move = self.file + str(self.rank - 2)
-            promotion_rank = 1
-            
-        #pawn can only move forward if unoccupied    
-        square_in_front = self.file + rank_in_front
-        if not self.board[square_in_front]:
-            if rank_in_front == promotion_rank:
-                for piece in ['q', 'r', 'n', 'b']:
-                    moves.append(Move(self.square), square_in_front, False, piece)                    
-            else:
-                moves.append(Move(self.square, square_in_front))
-        if first_move and not self.board[first_move] and not self.board[square_in_front]:
-            moves.append(Move(self.square, first_move, True))
-            
-        #pawn can only move to attacking squares if occupied...
-        neighboring_files = (move_file(self.file, 1), move_file(self.file, -1 ))
-        attackable_squares = (neighboring_files[0] + rank_in_front, neighboring_files[1] + rank_in_front)
-        for square in attackable_squares:
-            piece_on_square = self.board.get_piece_on_square(square)
-            if piece_on_square and piece_on_square != self.color:
-                moves.append(Move(self.square, square))
-            elif self.board.en_passant_square == square:
-                moves.append(Move(self.square, square))
-        return moves
-    
-    
-    def knight_moves(self):
-        moves = []
-        for rank in [self.rank + 2, self.rank - 2]:
-            for file in [move_file(self.file, -1), move_file(self.file, 1)]:
-                target_square = file + str(rank)
-                #print("checking target_square", target_square)
-                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece_on_square(target_square).color != self.color):
-                     moves.append(Move(self.square, target_square))
-                     
-        for rank in [self.rank + 1, self.rank - 1]:
-            for file in [move_file(self.file, -2), move_file(self.file, 2)]:
-                target_square = file + str(rank)
-                #print("checking target_square", target_square)
-                if on_board(target_square) and (not self.board[target_square] or self.board.get_piece_on_square(target_square).color != self.color):
-                     moves.append(Move(self.square, target_square))
-        return moves
-    
-    def bishop_moves(self):
-        moves = []
-        for direction in [northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal]:
-            obstructed = False
-            current_square = self.square
-            while not obstructed:
-                target_square = direction(current_square)
-                if not on_board(target_square):
-                    break
-                if self.board[target_square]:
-                    obstructed = True
-                    piece = self.board.get_piece_on_square(target_square)
-                    if piece.color != self.color:
-                        moves.append(Move(self.square, target_square))
-                else:
-                    moves.append(Move(self.square, target_square))
-                    current_square = target_square                 
-        return moves
-    def rook_moves(self):
-        moves = []
-        for direction in [down_file, up_file, east_rank, west_rank]:
-            obstructed = False
-            current_square = self.square
-            while not obstructed:
-                target_square = direction(current_square)
-                if not on_board(target_square):
-                    break
-                if self.board[target_square]:
-                    obstructed = True
-                    piece = self.board.get_piece_on_square(target_square)
-                    if piece.color != self.color:
-                        moves.append(Move(self.square, target_square))
-                else:
-                    moves.append(Move(self.square, target_square))
-                    current_square = target_square                 
-        return moves
-    def queen_moves(self):
-        moves = self.bishop_moves() + self.rook_moves()
-        return moves
-    def king_moves(self):
-        moves = [] 
-        
-        #single moves
-        directions = [down_file, up_file, east_rank, west_rank, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal]
-        possible_squares = [direction(self.square) for direction in directions if on_board(direction(self.square)) and not self.board[direction(self.square)]]
-        for square in possible_squares:
-            test_board = self.board.copy()
-            possible_move = Move(self.square, square)
-            test_board.do_move(possible_move)
-            if self.color == 'white':
-                if not test_board.is_white_check():
-                    moves.append(possible_move)
-            else:
-                if not test_board.is_black_check():
-                    moves.append(possible_move)
-        #castling
-        if self.color == 'white':
-            if not self.board.is_white_check():
-                if self.board.white_castle_rights['kingside']:
-                    #check the possible squares
-                    for intervening_square in ['g1', 'f1']:
-                        if not self.board[intervening_square] and intervening_square not in self.board.get_black_moves():
-                            moves.append(self.square, 'g1', castling='kingside')
-                if self.board.white_castle_rights['queenside']:
-                    #check the possible squares
-                    if not self.board['b1']:
-                        for intervening_square in ['d1', 'c1']:
-                            if not self.board[intervening_square] and intervening_square not in self.board.get_black_moves():
-                                moves.append(self.square, 'c1', castling='queenside')
-        if self.color == 'black':
-            if not self.board.is_black_check():
-                if self.board.check_castle_rights['kingside']:
-                    #check the possible squares
-                    for intervening_square in ['g8', 'f8']:
-                        if not self.board[intervening_square] and intervening_square not in self.board.get_white_moves():
-                            moves.append(self.square, 'g8', castling='kingside')
-                if self.board.white_castle_rights['queenside']:
-                    #check the possible squares
-                    if not self.board['b8']:
-                        for intervening_square in ['d8', 'c8']:
-                            if not self.board[intervening_square] and intervening_square not in self.board.get_white_moves():
-                                moves.append(self.square, 'c8', castling='queenside')
-            
-        return moves
     
     def __repr__(self):
         return "{} {} located on {}".format(self.color, self.piece, self.square)
