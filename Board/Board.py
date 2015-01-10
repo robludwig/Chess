@@ -136,14 +136,14 @@ class Board:
     #checks and checkmates...
     def is_white_check(self):
         white_king_square = self.get_piece_square('K')
-        return white_king_square in self.get_black_moves()
+        return white_king_square in self.get_black_attacked_squares()
     
     def is_white_checkmate(self):
         return self.is_white_check() and self.get_white_moves() == []
     
     def is_black_check(self):
         black_king_square = self.get_piece_square('k')
-        return black_king_square in self.get_white_moves()
+        return black_king_square in self.get_white_attacked_squares()
     
     def is_black_checkmate(self):
         return self.is_black_check() and self.get_black_moves() == []
@@ -179,6 +179,19 @@ class Board:
         for piece in self.get_black_moves():
             moves.extend(piece.get_moves())
         return moves
+    
+    #attacked squares
+    def get_white_attacked_squares(self):
+        squares = []
+        for piece in self.get_white_pieces():
+            squares.extend(piece.get_attacked_squares())
+        return squares
+    
+    def get_black_attacked_squares(self):
+        squares = []
+        for piece in self.get_black_pieces():
+            squares.extend(piece.get_attacked_squares())
+        return squares
     
     def do_move(self, move):
         '''
