@@ -59,7 +59,6 @@ class Board:
         current_square = ['a', 8]
         def move_forward_on_rank(steps=1):
             current_letter_index = string.ascii_lowercase.find(current_square[0])
-           #print("current_letter_index is ", current_letter_index, " and the char there is ", string.ascii_lowercase[current_letter_index])
             current_square[0] = string.ascii_lowercase[current_letter_index + steps]
 
         #place all the pieces
@@ -241,11 +240,11 @@ class Board:
         self.side_to_move = "white" if self.side_to_move == "black" else "black"
         self.move_count += 1
         #remove castling rights if necessary
-        if original_piece in ['kKrR']:
+        if original_piece in 'kKrR':
             if original_piece == 'k':
                 self.black_castle_rights = {}
             if original_piece == 'K':
-                self.black_castle_rights == {}
+                self.black_castle_rights = {}
             else:
                 if move.origin == 'a1':
                     self.white_castle_rights['queenside'] = False

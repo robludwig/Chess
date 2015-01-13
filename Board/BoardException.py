@@ -4,9 +4,9 @@ Created on Dec 6, 2014
 @author: Robert
 '''
 
-class MyClass(Exception):
+class BoardException(Exception):
     '''
-    classdocs
+    Illegal board state.
     '''
 
 
