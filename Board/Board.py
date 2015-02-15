@@ -38,6 +38,7 @@ class Board:
         self.en_passant_square = None
         self.half_move_count = 0
         self.move_count = 0
+        self.moves = []
     
     def copy(self):
         return deepcopy(self)
@@ -260,5 +261,6 @@ class Board:
             self.half_move_count = 0
         else:
             self.half_move_count += 1
+        self.moves.append(move)
         return
         
