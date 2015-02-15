@@ -11,7 +11,7 @@ from Evalution.Evaluate import evaluate
 if __name__ == '__main__':
     board = Board.Board()
     print("all squares:", Utils.all_squares)
-    board.reset_to_starting_positiion()
+    board.reset_to_starting_position()
     print(board)
     print(board.get_white_pieces())
     print(sum([piece.get_base_value() for piece in board.get_black_pieces()]))

@@ -42,7 +42,7 @@ class Board:
     def copy(self):
         return deepcopy(self)
     
-    def reset_to_starting_positiion(self):
+    def reset_to_starting_position(self):
         self.parse_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
         
     def parse_from_fen(self, fen_string):
