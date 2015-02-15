@@ -4,10 +4,6 @@ Created on Dec 6, 2014
 @author: Robert
 '''
 
-import string
-from .Move import Move
-from .Utils import on_board, move_file, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal
-from .Utils import down_file, up_file, east_rank, west_rank
 from .PieceMoves import bishop_moves, pawn_moves, knight_moves, king_moves, rook_moves, queen_moves
 from .PieceAttacks import bishop_attacks, pawn_attacks, knight_attacks, king_attacks, rook_attacks, queen_attacks
 
