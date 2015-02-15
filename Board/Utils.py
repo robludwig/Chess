@@ -45,6 +45,8 @@ def west_rank(square):
     file, rank = square[0], int(square[1])
     return move_file(file, 1) + str(rank)
 
+all_squares = [a + b for a in 'abcdefgh' for b in '12345678']
+
 
  
 
