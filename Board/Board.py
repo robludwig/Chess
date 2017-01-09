@@ -63,7 +63,7 @@ class Board:
             current_square[0] = string.ascii_lowercase[current_letter_index + steps]
 
         #place all the pieces
-        print("piece placements: ", piece_placements)
+        #print("piece placements: ", piece_placements)
         ranks = piece_placements.split('/')
         for rank_string in ranks:
             for char in rank_string:
@@ -80,16 +80,17 @@ class Board:
             current_square[0] = 'a'
         
         #active color
-        print("active color: ", active_color)
+        #print("active color: ", active_color)
         if active_color == 'w':
             self.side_to_move = "white"
         else:
             self.side_to_move = "black"
             
         #castling rights are either "-" for none, or a list of letters
-        print("castling rights: ", castling_rights)
+        #print("castling rights: ", castling_rights)
         if castling_rights == "-":
-            print("nobody has castling rights")
+            pass
+            #print("nobody has castling rights")
         else:
             self.black_castle_rights['queenside'] = 'q' in castling_rights
             self.black_castle_rights['kingside'] = 'k' in castling_rights
@@ -97,7 +98,7 @@ class Board:
             self.white_castle_rights['kingside'] = 'K' in castling_rights
         
         #ep
-        print("en passant square ", en_passant)
+        #print("en passant square ", en_passant)
         self.en_passant_square = en_passant if en_passant != "-" else ''
         
         #half and full move clocks...
@@ -174,11 +175,15 @@ class Board:
         for piece in self.get_white_pieces():
             moves.extend(piece.get_moves())
         return moves
+    
     def get_black_moves(self):
         moves = []
-        for piece in self.get_black_moves():
+        for piece in self.get_black_pieces():
             moves.extend(piece.get_moves())
         return moves
+    
+    def get_moves(self):
+        return self.get_white_moves() if self.side_to_move == "white" else self.get_black_moves()
     
     #attacked squares
     def get_white_attacked_squares(self):
@@ -207,7 +212,7 @@ class Board:
         else:
             self.en_passant_square = ''
                         
-        capture = self.board[move.destination] 
+        capture = move.destination in self.board
         
         #write in the new piece if it's a promotion, or the original piece otherwise
         if move.castle:
@@ -257,7 +262,7 @@ class Board:
                     self.black_castle_rights['kingside'] = False
             
         #reset the half-ply counter if capture or pawn move
-        if capture or original_piece.tolower == Piece.PAWN:
+        if capture or original_piece.lower() == Piece.PAWN:
             self.half_move_count = 0
         else:
             self.half_move_count += 1

@@ -6,7 +6,6 @@ Piece attack functions
 
 from .Utils import on_board, move_file, northeast_diagonal, northwest_diagonal, southeast_diagonal, southwest_diagonal
 from .Utils import down_file, up_file, east_rank, west_rank
-from test.test_builtin import Squares
 
 def pawn_attacks(pawn):
     if pawn.color == 'white':

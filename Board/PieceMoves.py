@@ -121,29 +121,29 @@ def king_moves(self):
     #castling
     if self.color == 'white':
         if not self.board.is_white_check():
-            if self.board.white_castle_rights['kingside']:
+            if self.board.white_castle_rights.get('kingside', False):
                 #check the possible squares
                 for intervening_square in ['g1', 'f1']:
                     if not self.board[intervening_square] and intervening_square not in self.board.get_black_attacked_squares():
-                        moves.append(self.square, 'g1', castling='kingside')
-            if self.board.white_castle_rights['queenside']:
+                        moves.append(Move(self.square, 'g1', castle='kingside'))
+            if self.board.white_castle_rights.get('queenside', False):
                 #check the possible squares
                 if not self.board['b1']:
                     for intervening_square in ['d1', 'c1']:
                         if not self.board[intervening_square] and intervening_square not in self.board.get_black_attacked_squares():
-                            moves.append(self.square, 'c1', castling='queenside')
+                            moves.append(Move(self.square, 'c1', castle='queenside'))
     if self.color == 'black':
         if not self.board.is_black_check():
-            if self.board.check_castle_rights['kingside']:
+            if self.board.black_castle_rights.get('kingside', False):
                 #check the possible squares
                 for intervening_square in ['g8', 'f8']:
                     if not self.board[intervening_square] and intervening_square not in self.board.get_white_attacked_squares():
-                        moves.append(self.square, 'g8', castling='kingside')
-            if self.board.white_castle_rights['queenside']:
+                        moves.append(Move(self.square, 'g8', castle='kingside'))
+            if self.board.black_castle_rights.get('queenside', False):
                 #check the possible squares
                 if not self.board['b8']:
                     for intervening_square in ['d8', 'c8']:
                         if not self.board[intervening_square] and intervening_square not in self.board.get_white_attacked_squares():
-                            moves.append(self.square, 'c8', castling='queenside')
+                            moves.append(Move(self.square, 'c8', castle='queenside'))
         
     return moves

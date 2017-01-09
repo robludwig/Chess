@@ -6,6 +6,7 @@ Created on Dec 6, 2014
 
 from Board import Board, Utils
 from Evalution.Evaluate import evaluate
+from Tree import Tree
 
 
 if __name__ == '__main__':
@@ -19,4 +20,6 @@ if __name__ == '__main__':
     print("white attacked squares: ", board.get_white_attacked_squares())
     print("black attacked squares: ", board.get_black_attacked_squares())
     print(evaluate(board))
+    game_tree = Tree.Tree(board)
+    game_tree.doSearch()
     
