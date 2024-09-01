@@ -11,13 +11,13 @@ from collections import Counter
 CHECKMATE_VALUE = 10000
 CENTRAL_SQUARES = ['e4', 'e5', 'd4', 'd5']
 
-def evaluate_material(board):
+def evaluate_material(board) -> float:
     #list
     white_pieces = sum([piece.get_base_value() for piece in board.get_white_pieces()])
     black_pieces = sum([piece.get_base_value() for piece in board.get_black_pieces()])
     return white_pieces - black_pieces     
 
-def evaluate_squares(board):
+def evaluate_squares(board) -> float:
     white_squares = Counter(board.get_white_attacked_squares())
     black_squares = Counter(board.get_black_attacked_squares())
     
@@ -32,17 +32,17 @@ def evaluate_squares(board):
             sum -= 1
     return sum
 
-def evaluate_control(board):
+def evaluate_control(board) -> int:
     white_center_squares = [square for square in board.get_white_attacked_squares() if square in CENTRAL_SQUARES]
     black_central_squares = [square for square in board.get_black_attacked_squares() if square in CENTRAL_SQUARES]
     return len(white_center_squares) - len(black_central_squares)                         
     
-def evaluate(board):
+def evaluate(board) -> float:
     if board.is_checkmate():
         return CHECKMATE_VALUE if board.is_white_checkmate() else -1 * CHECKMATE_VALUE
-    return {
-                'material' : evaluate_material(board),
-                'squares'  : evaluate_squares(board),
-                'center_control' : evaluate_control(board)
-            }
+   
+    material = evaluate_material(board)
+    squares  = evaluate_squares(board)
+    center_control = evaluate_control(board)
+    return material + squares + center_control
           

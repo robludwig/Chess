@@ -21,5 +21,5 @@ if __name__ == '__main__':
     print("black attacked squares: ", board.get_black_attacked_squares())
     print(evaluate(board))
     game_tree = Tree.Tree(board)
-    game_tree.doSearch()
+    game_tree.doSearch(2)
     

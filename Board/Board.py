@@ -9,6 +9,7 @@ from copy import deepcopy
 
 from . import BoardException
 from .Piece import Piece
+from .Utils import all_squares
 
 
 class Board:
@@ -104,6 +105,17 @@ class Board:
         #half and full move clocks...
         self.half_move_count = int(half_moves)
         self.move_count = int(full_moves)
+    
+    def to_fen(self)->str:
+        ranks = []
+        for rank_list in [[a+b for a in 'abcdefgh'] for b in '12345678']:
+            rank = []
+            for square in rank_list:
+                piece = self.get(square)
+                rank.append(piece)
+            ranks.append("".join(rank))
+        return "/".join(ranks)
+
     
     #magic methods for treating a board as a dictionary
     def __getitem__(self, key):
